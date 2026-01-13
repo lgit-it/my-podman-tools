@@ -1,0 +1,57 @@
+# Odoo 18 Community build from source (GitHub) with venv (PEP 668 compatible)
+FROM docker.io/library/ubuntu:24.04
+
+ARG ODOO_BRANCH=18.0
+ARG ODOO_CORE_REPO=https://github.com/odoo/odoo.git
+ARG ODOO_UID=1089
+ARG ODOO_GID=1089
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Base deps
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  ca-certificates curl git openssh-client \
+  python3 python3-pip python3-venv python3-dev \
+  build-essential gcc pkg-config \
+  postgresql-client libpq-dev \
+  libxml2-dev libxslt1-dev \
+  libsasl2-dev libldap2-dev libssl-dev \
+  libjpeg-dev zlib1g-dev \
+  libfreetype6-dev liblcms2-dev libwebp-dev \
+  libharfbuzz-dev libfribidi-dev \
+  nodejs npm \
+  wkhtmltopdf \
+  fonts-dejavu-core fonts-freefont-ttf \
+  && rm -rf /var/lib/apt/lists/*
+
+# Node deps for assets
+RUN npm install -g rtlcss less less-plugin-clean-css
+
+# Create odoo user with fixed UID/GID to simplify host volume permissions
+RUN groupadd -g ${ODOO_GID} odoo && useradd -m -u ${ODOO_UID} -g ${ODOO_GID}  -s /bin/bash odoo
+
+WORKDIR /opt/odoo
+
+# Odoo core
+RUN git clone --depth 1 --branch ${ODOO_BRANCH} ${ODOO_CORE_REPO} odoo
+
+# Runtime dirs + mount points
+RUN mkdir -p /mnt/extra-addons /mnt/custom-addons /var/lib/odoo /var/lib/odoo/backups /var/log/odoo /etc/odoo
+
+# Virtualenv dedicated to Odoo
+RUN python3 -m venv /opt/odoo/venv
+ENV PATH="/opt/odoo/venv/bin:$PATH"
+
+# Python requirements
+RUN pip install --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir -r /opt/odoo/odoo/requirements.txt && \
+    pip install --no-cache-dir Babel
+
+# Permissions
+RUN chown -R odoo:odoo /opt/odoo /var/lib/odoo /var/log/odoo /etc/odoo /mnt/extra-addons /mnt/custom-addons
+
+EXPOSE 8069 8072
+
+USER odoo
+
+CMD ["python3","/opt/odoo/odoo/odoo-bin","-c","/etc/odoo/odoo.conf"]

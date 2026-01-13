@@ -1,0 +1,3 @@
+# Nginx reverse proxy container (config is mounted from host)
+FROM docker.io/library/nginx:1.25-alpine
+# no customizations needed; configs/certs are bind-mounted

@@ -1,0 +1,2 @@
+# Optional: local wrapper image for Postgres (not required).
+FROM docker.io/library/postgres:16

@@ -1,0 +1,2 @@
+# Optional: local wrapper image for n8n (not required).
+FROM docker.io/n8nio/n8n:1.39.1
