@@ -1,11 +1,23 @@
 server {
     listen 80;
     server_name ${ODOO_DOMAIN};
-    return 301 https://$host$request_uri;
+
+    # REQUIRED: Allows Certbot to renew certificates via webroot
+    location /.well-known/acme-challenge/ {
+        root /srv/containers/nginx/www;
+    }
+
+    # Redirect all other HTTP traffic to HTTPS
+    location / {
+        return 301 https://\$host\$request_uri;
+    }
 }
 
 server {
-    listen 443 ssl http2;
+    # Fixed: Moved http2 to its own directive (Nginx 1.25.1+ compatibility)
+    listen 443 ssl;
+    http2 on;
+
     server_name ${ODOO_DOMAIN};
 
     ssl_certificate     /etc/letsencrypt/live/${ODOO_DOMAIN}/fullchain.pem;
@@ -24,6 +36,11 @@ server {
     }
 
     location /longpolling {
+        # Added: Explicit WebSocket/Upgrade support for Odoo live notifications
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+
         include /etc/nginx/snippets/proxy-headers.conf;
         proxy_pass http://127.0.0.1:${ODOO_LONGPOLL_HOST_PORT};
         proxy_redirect off;

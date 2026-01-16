@@ -102,7 +102,7 @@ pg_uid="$(get_uid_from_image "${POSTGRES_IMAGE}" "postgres")"
 chown -R "${pg_uid}:${pg_uid}" "${PG_DATA_DIR}"
 
 # Odoo: UID/GID fissati
-chown -R "${ODOO_UID}:${ODOO_GID}" "${ODOO_DATA_DIR}" "${ODOO_LOG_DIR}" "${ODOO_BACKUP_DIR}"
+chown -R "${ODOO_UID}:${ODOO_GID}" "${ODOO_DATA_DIR}" "${ODOO_CONF_DIR}" "${ODOO_LOG_DIR}" "${ODOO_BACKUP_DIR}" "${ODOO_STD_ADDONS_DIR}" "${ODOO_CUST_ADDONS_DIR}"
 
 # n8n: UID node letto dall’immagine
 n8n_uid="$(get_uid_from_image "${N8N_IMAGE}" "node")"

@@ -32,8 +32,6 @@ RUN groupadd -g ${ODOO_GID} odoo && useradd -m -u ${ODOO_UID} -g ${ODOO_GID}  -s
 
 WORKDIR /opt/odoo
 
-# Odoo core
-RUN git clone --depth 1 --branch ${ODOO_BRANCH} ${ODOO_CORE_REPO} odoo
 
 # Runtime dirs + mount points
 RUN mkdir -p /mnt/extra-addons /mnt/custom-addons /var/lib/odoo /var/lib/odoo/backups /var/log/odoo /etc/odoo
@@ -42,10 +40,14 @@ RUN mkdir -p /mnt/extra-addons /mnt/custom-addons /var/lib/odoo /var/lib/odoo/ba
 RUN python3 -m venv /opt/odoo/venv
 ENV PATH="/opt/odoo/venv/bin:$PATH"
 
+# Odoo core
+RUN git clone --depth 1 --branch ${ODOO_BRANCH} ${ODOO_CORE_REPO} odoo
+
 # Python requirements
 RUN pip install --upgrade pip setuptools wheel && \
-    pip install --no-cache-dir -r /opt/odoo/odoo/requirements.txt && \
-    pip install --no-cache-dir Babel
+pip install --no-cache-dir -r /opt/odoo/odoo/requirements.txt && \
+pip install --no-cache-dir Babel
+
 
 # Permissions
 RUN chown -R odoo:odoo /opt/odoo /var/lib/odoo /var/log/odoo /etc/odoo /mnt/extra-addons /mnt/custom-addons

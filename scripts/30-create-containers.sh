@@ -30,6 +30,8 @@ log "Creazione container Postgres..."
 podman create \
   --name postgres \
   --network "${PODMAN_NET}" \
+  --hostname postgres \
+  --network-alias postgres \
   -p "${PG_BIND}" \
   --env-file "${SECRETS_DIR}/postgres.env" \
   -v "${PG_DATA_DIR}:/var/lib/postgresql/data${VOL_LBL}" \
@@ -43,6 +45,8 @@ log "Creazione container Odoo..."
 podman create \
   --name odoo \
   --network "${PODMAN_NET}" \
+  --hostname odoo \
+  --network-alias odoo \
   -p "${ODOO_BIND}" \
   -p "${ODOO_LP_BIND}" \
   -v "${ODOO_DATA_DIR}:/var/lib/odoo${VOL_LBL}" \

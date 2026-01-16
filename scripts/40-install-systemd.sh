@@ -18,7 +18,7 @@ pushd "${tmpd}" >/dev/null
 podman generate systemd --new --files --name postgres
 podman generate systemd --new --files --name odoo
 podman generate systemd --new --files --name n8n
-podman generate systemd --new --files --name nginx-proxy
+# podman generate systemd --new --files --name nginx-proxy
 
 log "Installo unit in /etc/systemd/system"
 cp -f ./*.service /etc/systemd/system/
@@ -43,11 +43,11 @@ EOF
 
 log "Override dipendenze: nginx dopo odoo+n8n (best effort)"
 mkdir -p /etc/systemd/system/container-nginx-proxy.service.d
-cat >/etc/systemd/system/container-nginx-proxy.service.d/override.conf <<'EOF'
-[Unit]
-After=container-odoo.service container-n8n.service
-Wants=container-odoo.service container-n8n.service
-EOF
+#cat >/etc/systemd/system/container-nginx-proxy.service.d/override.conf <<'EOF'
+#[Unit]
+#After=container-odoo.service container-n8n.service
+#Wants=container-odoo.service container-n8n.service
+#EOF
 
 systemctl daemon-reload
 
@@ -55,7 +55,7 @@ log "Enable & start servizi"
 systemctl enable --now container-postgres.service
 systemctl enable --now container-odoo.service
 systemctl enable --now container-n8n.service
-systemctl enable --now container-nginx-proxy.service
+#systemctl enable --now container-nginx-proxy.service
 
 log "Stato servizi:"
 systemctl --no-pager --full status container-postgres.service container-odoo.service container-n8n.service container-nginx-proxy.service | sed -n '1,40p' || true

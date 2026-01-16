@@ -14,8 +14,7 @@ Questo pacchetto scompone lo script monolitico in componenti eseguibili separata
 
 ## Quick start (ordine suggerito)
 ```bash
-unzip OdooPodmanSplitKit.zip -d /opt/odoo-kit
-cd /opt/odoo-kit
+
 
 # 1) configura variabili
 cp .env.example .env

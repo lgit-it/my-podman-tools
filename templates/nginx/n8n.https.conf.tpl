@@ -1,11 +1,23 @@
 server {
     listen 80;
     server_name ${N8N_DOMAIN};
-    return 301 https://$host$request_uri;
+
+    # REQUIRED: Allows Certbot to renew certificates via webroot
+    location /.well-known/acme-challenge/ {
+        root /srv/containers/nginx/www;
+    }
+
+    # Redirect all other HTTP traffic to HTTPS
+    location / {
+        return 301 https://\$host\$request_uri;
+    }
 }
 
 server {
-    listen 443 ssl http2;
+    # Fixed: Removed 'http2' from the listen line to resolve deprecation warning
+    listen 443 ssl;
+    http2 on; 
+
     server_name ${N8N_DOMAIN};
 
     ssl_certificate     /etc/letsencrypt/live/${N8N_DOMAIN}/fullchain.pem;
@@ -15,7 +27,9 @@ server {
 
     location / {
         proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
+        
+        # Corrected: Standard WebSocket upgrade headers for n8n
+        proxy_set_header Upgrade \$http_upgrade;
         proxy_set_header Connection "upgrade";
 
         proxy_read_timeout 3600s;

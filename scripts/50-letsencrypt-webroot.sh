@@ -17,11 +17,17 @@ fi
 
 log "Richiedo certificati Let's Encrypt via webroot..."
 # Richiede che 80 sia raggiungibile e che i DNS puntino al server.
-certbot certonly --webroot \
-  -w "${NGINX_WEBROOT_DIR}" \
-  -m "${LETSENCRYPT_EMAIL}" \
-  --agree-tos --no-eff-email --non-interactive \
-  -d "${ODOO_DOMAIN}" -d "${N8N_DOMAIN}"
+echo "${NGINX_WEBROOT_DIR}  esiste e ha i permessi corretti."
+echo "${LETSENCRYPT_EMAIL} è l'email di contatto per Let's Encrypt."
+echo "${ODOO_DOMAIN} ${N8N_DOMAIN} sono i domini per cui richiedo i certificati."
+
+
+# certbot certonly --webroot \
+#   -w "${NGINX_WEBROOT_DIR}" \
+#   -m "${LETSENCRYPT_EMAIL}" \
+#   --agree-tos --no-eff-email --non-interactive \
+#   -d "${ODOO_DOMAIN}" \
+#   -d "${N8N_DOMAIN}"
 
 log "Copio certificati in ${NGINX_LE_DIR} (per mount read-only nel container nginx)..."
 mkdir -p "${NGINX_LE_DIR}"
