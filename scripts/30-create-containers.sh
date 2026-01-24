@@ -18,11 +18,13 @@ if [[ "${BIND_LOCALHOST:-1}" == "1" ]]; then
   PG_BIND="127.0.0.1:${POSTGRES_HOST_PORT}:5432"
   ODOO_BIND="127.0.0.1:${ODOO_HOST_PORT}:8069"
   ODOO_LP_BIND="127.0.0.1:${ODOO_LONGPOLL_HOST_PORT}:8072"
+  ODOO_DEBUG_BIND="127.0.0.1:${ODOO_DEBUG_HOST_PORT}:8678"
   N8N_BIND="127.0.0.1:${N8N_HOST_PORT}:5678"
 else
   PG_BIND="${POSTGRES_HOST_PORT}:5432"
   ODOO_BIND="${ODOO_HOST_PORT}:8069"
   ODOO_LP_BIND="${ODOO_LONGPOLL_HOST_PORT}:8072"
+  ODOO_DEBUG_BIND="${ODOO_DEBUG_HOST_PORT}:8678"
   N8N_BIND="${N8N_HOST_PORT}:5678"
 fi
 
@@ -49,6 +51,7 @@ podman create \
   --network-alias odoo \
   -p "${ODOO_BIND}" \
   -p "${ODOO_LP_BIND}" \
+  -p "${ODOO_DEBUG_BIND}" \
   -v "${ODOO_DATA_DIR}:/var/lib/odoo${VOL_LBL}" \
   -v "${ODOO_LOG_DIR}:/var/log/odoo${VOL_LBL}" \
   -v "${ODOO_BACKUP_DIR}:/var/lib/odoo/backups${VOL_LBL}" \
@@ -70,7 +73,7 @@ log "Creazione container Nginx reverse-proxy..."
 # Nginx è esposto su 80/443 verso Internet; i backend restano su localhost.
 podman create \
   --name nginx-proxy \
-  --network host \
+  --network "${PODMAN_NET}" \
   -p "${NGINX_HTTP_PORT}:80" \
   -p "${NGINX_HTTPS_PORT}:443" \
   -v "${NGINX_CONFD_DIR}:/etc/nginx/conf.d${VOL_LBL}" \

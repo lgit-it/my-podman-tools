@@ -11,51 +11,86 @@ require_root
 ensure_cmd podman
 ensure_cmd systemctl
 
-log "Genero unit systemd (podman generate systemd --new)"
-tmpd="$(mktemp -d)"
-pushd "${tmpd}" >/dev/null
+QUADLET_DIR="/etc/containers/systemd"
+mkdir -p "$QUADLET_DIR"
 
-podman generate systemd --new --files --name postgres
-podman generate systemd --new --files --name odoo
-podman generate systemd --new --files --name n8n
-# podman generate systemd --new --files --name nginx-proxy
+log "Configurazione Quadlet in $QUADLET_DIR"
 
-log "Installo unit in /etc/systemd/system"
-cp -f ./*.service /etc/systemd/system/
-
-popd >/dev/null
-rm -rf "${tmpd}"
-
-log "Override dipendenze: odoo e n8n dopo postgres"
-mkdir -p /etc/systemd/system/container-odoo.service.d
-cat >/etc/systemd/system/container-odoo.service.d/override.conf <<'EOF'
+# 1. Postgres
+cat > "${QUADLET_DIR}/postgres.container" <<EOF
 [Unit]
-After=container-postgres.service
-Requires=container-postgres.service
+Description=PostgreSQL Container
+
+[Container]
+Image=postgres:latest
+ContainerName=postgres
+# Aggiungi qui i tuoi volumi o variabili d'ambiente, es:
+# Environment=POSTGRES_PASSWORD=password
+# Volume=/opt/postgres/data:/var/lib/postgresql/data:Z
+
+[Install]
+WantedBy=multi-user.target default.target
 EOF
 
-mkdir -p /etc/systemd/system/container-n8n.service.d
-cat >/etc/systemd/system/container-n8n.service.d/override.conf <<'EOF'
+# 2. Odoo
+cat > "${QUADLET_DIR}/odoo.container" <<EOF
 [Unit]
-After=container-postgres.service
-Requires=container-postgres.service
+Description=Odoo Container
+After=postgres.service
+Requires=postgres.service
+
+[Container]
+Image=odoo:latest
+ContainerName=odoo
+# Link al database
+Environment=HOST=postgres
+
+[Install]
+WantedBy=multi-user.target default.target
 EOF
 
-log "Override dipendenze: nginx dopo odoo+n8n (best effort)"
-mkdir -p /etc/systemd/system/container-nginx-proxy.service.d
-#cat >/etc/systemd/system/container-nginx-proxy.service.d/override.conf <<'EOF'
-#[Unit]
-#After=container-odoo.service container-n8n.service
-#Wants=container-odoo.service container-n8n.service
-#EOF
+# 3. n8n
+cat > "${QUADLET_DIR}/n8n.container" <<EOF
+[Unit]
+Description=n8n Container
+After=postgres.service
+Requires=postgres.service
 
+[Container]
+Image=n8nio/n8n:latest
+ContainerName=n8n
+
+[Install]
+WantedBy=multi-user.target default.target
+EOF
+
+# 4. Nginx Proxy
+cat > "${QUADLET_DIR}/nginx-proxy.container" <<EOF
+[Unit]
+Description=Nginx Proxy Container
+After=odoo.service n8n.service
+Wants=odoo.service n8n.service
+
+[Container]
+Image=nginx:latest
+ContainerName=nginx-proxy
+
+[Install]
+WantedBy=multi-user.target default.target
+EOF
+
+log "Ricarica systemd (generazione automatica unit Quadlet)"
 systemctl daemon-reload
 
 log "Enable & start servizi"
-systemctl enable --now container-postgres.service
-systemctl enable --now container-odoo.service
-systemctl enable --now container-n8n.service
-#systemctl enable --now container-nginx-proxy.service
+log "Ricarica systemd (generazione automatica unit Quadlet)"
+systemctl daemon-reload
+
+log "Start servizi (già abilitati tramite [Install] nel file Quadlet)"
+# Nota: Usiamo solo 'start' o 'restart'. 
+# L'enable è gestito automaticamente dal generatore Quadlet.
+systemctl start postgres.service odoo.service n8n.service nginx-proxy.service
+
 
 log "Stato servizi:"
-systemctl --no-pager --full status container-postgres.service container-odoo.service container-n8n.service container-nginx-proxy.service | sed -n '1,40p' || true
+systemctl --no-pager --full status postgres.service odoo.service n8n.service nginx-proxy.service | sed -n '1,40p' || true

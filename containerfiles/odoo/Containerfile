@@ -44,7 +44,7 @@ ENV PATH="/opt/odoo/venv/bin:$PATH"
 RUN git clone --depth 1 --branch ${ODOO_BRANCH} ${ODOO_CORE_REPO} odoo
 
 # Python requirements
-RUN pip install --upgrade pip setuptools wheel && \
+RUN pip install --upgrade pip setuptools wheel debugpy && \
 pip install --no-cache-dir -r /opt/odoo/odoo/requirements.txt && \
 pip install --no-cache-dir Babel
 
@@ -52,8 +52,12 @@ pip install --no-cache-dir Babel
 # Permissions
 RUN chown -R odoo:odoo /opt/odoo /var/lib/odoo /var/log/odoo /etc/odoo /mnt/extra-addons /mnt/custom-addons
 
-EXPOSE 8069 8072
-
+EXPOSE 8069 8072 8678
 USER odoo
 
-CMD ["python3","/opt/odoo/odoo/odoo-bin","-c","/etc/odoo/odoo.conf"]
+# CMD ["python3","/opt/odoo/odoo/odoo-bin","-c","/etc/odoo/odoo.conf"]
+
+# Modifichiamo il CMD per lanciare debugpy. 
+# --wait-for-client blocca l'avvio di Odoo finché non premi F5 su VS Code.
+# Se vuoi che parta subito, usa --listen 0.0.0.0:5678 senza --wait-for-client.
+CMD ["python3", "-m", "debugpy", "--listen", "0.0.0.0:8678", "--wait-for-client", "/opt/odoo/odoo/odoo-bin", "-c", "/etc/odoo/odoo.conf"]
