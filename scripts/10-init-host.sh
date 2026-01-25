@@ -10,17 +10,22 @@ source "${ROOT_DIR}/scripts/lib.sh"
 require_root
 
 log "Installazione pacchetti base..."
+# apt_install ca-certificates curl git jq openssl \
+#   podman uidmap slirp4netns fuse-overlayfs containernetworking-plugins \
+#   nginx-full \
+#   certbot
+
 apt_install ca-certificates curl git jq openssl \
   podman uidmap slirp4netns fuse-overlayfs containernetworking-plugins \
-  nginx-full \
-  certbot
+#   nginx-full \
+#   certbot
 
 log "Creazione directory persistenti in ${BASE_DIR} ..."
 mkdir -p \
   "${PG_DATA_DIR}" "${PG_CONF_DIR}" "${PG_INIT_DIR}" \
   "${ODOO_BUILD_DIR}" "${ODOO_DATA_DIR}" "${ODOO_LOG_DIR}" "${ODOO_BACKUP_DIR}" "${ODOO_CONF_DIR}" \
   "${ODOO_STD_ADDONS_DIR}" "${ODOO_CUST_ADDONS_DIR}" \
-  "${N8N_DATA_DIR}" \
+  "${N8N_DATA_DIR}" "${NGINX_LOG_DIR}" \
   "${NGINX_CONFD_DIR}" "${NGINX_SNIPPETS_DIR}" "${NGINX_WEBROOT_DIR}" "${NGINX_LE_DIR}" \
   "${SECRETS_DIR}" \
   "${ROOT_DIR}/exports"

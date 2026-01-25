@@ -60,4 +60,4 @@ USER odoo
 # Modifichiamo il CMD per lanciare debugpy. 
 # --wait-for-client blocca l'avvio di Odoo finché non premi F5 su VS Code.
 # Se vuoi che parta subito, usa --listen 0.0.0.0:5678 senza --wait-for-client.
-CMD ["python3", "-m", "debugpy", "--listen", "0.0.0.0:8678", "--wait-for-client", "/opt/odoo/odoo/odoo-bin", "-c", "/etc/odoo/odoo.conf"]
+CMD ["python3", "-m", "debugpy", "--listen", "0.0.0.0:8678",  "/opt/odoo/odoo/odoo-bin", "-c", "/etc/odoo/odoo.conf"]
