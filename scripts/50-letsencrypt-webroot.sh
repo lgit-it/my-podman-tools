@@ -37,10 +37,10 @@ log "Rigenero conf nginx in HTTPS..."
 render_template "${ROOT_DIR}/templates/nginx/odoo.https.conf.tpl" "${NGINX_CONFD_DIR}/odoo.conf"
 render_template "${ROOT_DIR}/templates/nginx/n8n.https.conf.tpl"  "${NGINX_CONFD_DIR}/n8n.conf"
 
-log "Reload container nginx-proxy (systemd)..."
-systemctl restart container-nginx-proxy.service || {
+log "Reload container  (systemd)..."
+systemctl restart container-.service || {
   log "WARN: restart via systemd fallito, provo podman restart"
-  podman restart nginx-proxy || true
+  podman restart  || true
 }
 
 log "TLS abilitato."

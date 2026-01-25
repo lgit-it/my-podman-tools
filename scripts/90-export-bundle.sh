@@ -17,7 +17,7 @@ mkdir -p "${out_dir}"
 bundle="${out_dir}/bundle_${ts}.tar.gz"
 
 log "Fermo servizi per snapshot coerente..."
-systemctl stop container-nginx-proxy.service container-odoo.service container-n8n.service container-postgres.service || true
+systemctl stop container-.service container-odoo.service container-n8n.service container-postgres.service || true
 
 log "Creo bundle in ${bundle}"
 # Include BASE_DIR e .env (senza caricare segreti in chiaro in README; i segreti restano nel SECRETS_DIR)
@@ -32,6 +32,6 @@ tar -czf "${bundle}" \
   "scripts"
 
 log "Riavvio servizi..."
-systemctl start container-postgres.service container-odoo.service container-n8n.service container-nginx-proxy.service || true
+systemctl start container-postgres.service container-odoo.service container-n8n.service container-.service || true
 
 log "Bundle creato: ${bundle}"

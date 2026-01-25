@@ -11,7 +11,7 @@ require_root
 ensure_cmd podman
 
 log "Rimozione container esistenti (se presenti)..."
-podman rm -f postgres odoo n8n nginx-proxy >/dev/null 2>&1 || true
+podman rm -f postgres odoo n8n  >/dev/null 2>&1 || true
 
 # Porte bindate su localhost se BIND_LOCALHOST=1
 if [[ "${BIND_LOCALHOST:-1}" == "1" ]]; then
@@ -72,7 +72,7 @@ podman create \
 log "Creazione container Nginx reverse-proxy..."
 # Nginx è esposto su 80/443 verso Internet; i backend restano su localhost.
 podman create \
-  --name nginx-proxy \
+  --name  \
   --network "${PODMAN_NET}" \
   -p "${NGINX_HTTP_PORT}:80" \
   -p "${NGINX_HTTPS_PORT}:443" \
@@ -83,4 +83,4 @@ podman create \
   "local/nginx-proxy:latest"
 
 log "Container creati."
-log "Avvio manuale (se vuoi testare prima di systemd): podman start postgres odoo n8n nginx-proxy"
+log "Avvio manuale (se vuoi testare prima di systemd): podman start postgres odoo n8n "
