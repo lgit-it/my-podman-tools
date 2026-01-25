@@ -65,15 +65,14 @@ WantedBy=multi-user.target default.target
 EOF
 
 # 4. Nginx Proxy
-cat > "${QUADLET_DIR}/.container" <<EOF
+cat > "${QUADLET_DIR}/nginx.container" <<EOF
 [Unit]
 Description=Nginx Proxy Container
-After=odoo.service n8n.service
-Wants=odoo.service n8n.service
+
 
 [Container]
 Image=nginx:latest
-ContainerName=
+ContainerName=nginx
 
 [Install]
 WantedBy=multi-user.target default.target
@@ -89,8 +88,8 @@ systemctl daemon-reload
 log "Start servizi (già abilitati tramite [Install] nel file Quadlet)"
 # Nota: Usiamo solo 'start' o 'restart'. 
 # L'enable è gestito automaticamente dal generatore Quadlet.
-systemctl start postgres.service odoo.service n8n.service .service
+systemctl start postgres.service odoo.service n8n.service nginx.service
 
 
 log "Stato servizi:"
-systemctl --no-pager --full status postgres.service odoo.service n8n.service .service | sed -n '1,40p' || true
+systemctl --no-pager --full status postgres.service odoo.service n8n.service nginx.service | sed -n '1,40p' || true
