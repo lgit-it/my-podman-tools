@@ -15,19 +15,20 @@ if [[ "${ENABLE_LETSENCRYPT}" != "1" ]]; then
   exit 0
 fi
 
-log "Richiedo certificati Let's Encrypt via webroot..."
+log "Richiedo certificati Let's Encrypt via standalone mode..."
 # Richiede che 80 sia raggiungibile e che i DNS puntino al server.
-echo "${NGINX_WEBROOT_DIR}  esiste e ha i permessi corretti."
-echo "${LETSENCRYPT_EMAIL} è l'email di contatto per Let's Encrypt."
-echo "${ODOO_DOMAIN} ${N8N_DOMAIN} sono i domini per cui richiedo i certificati."
+echo "Email di contatto: ${LETSENCRYPT_EMAIL}"
+echo "Domini: ${ODOO_DOMAIN} ${N8N_DOMAIN}"
 
+log "Fermo container nginx (se in esecuzione) per liberare porta 80..."
+podman stop nginx 2>/dev/null || true
 
-# certbot certonly --webroot \
-#   -w "${NGINX_WEBROOT_DIR}" \
-#   -m "${LETSENCRYPT_EMAIL}" \
-#   --agree-tos --no-eff-email --non-interactive \
-#   -d "${ODOO_DOMAIN}" \
-#   -d "${N8N_DOMAIN}"
+log "Eseguo certbot in standalone mode..."
+certbot certonly --standalone \
+  -m "${LETSENCRYPT_EMAIL}" \
+  --agree-tos --no-eff-email --non-interactive \
+  -d "${ODOO_DOMAIN}" \
+  -d "${N8N_DOMAIN}"
 
 log "Copio certificati in ${NGINX_LE_DIR} (per mount read-only nel container nginx)..."
 mkdir -p "${NGINX_LE_DIR}"
@@ -37,10 +38,9 @@ log "Rigenero conf nginx in HTTPS..."
 render_template "${ROOT_DIR}/templates/nginx/odoo.https.conf.tpl" "${NGINX_CONFD_DIR}/odoo.conf"
 render_template "${ROOT_DIR}/templates/nginx/n8n.https.conf.tpl"  "${NGINX_CONFD_DIR}/n8n.conf"
 
-log "Reload container  (systemd)..."
-systemctl restart container-.service || {
-  log "WARN: restart via systemd fallito, provo podman restart"
-  podman restart  || true
+log "Riavvio container nginx..."
+podman start nginx 2>/dev/null || {
+  log "WARN: nginx non avviato. Avvialo manualmente con: podman start nginx"
 }
 
-log "TLS abilitato."
+log "TLS abilitato. Certificati in ${NGINX_LE_DIR}"
