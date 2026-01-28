@@ -8,7 +8,7 @@ $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "00-env.ps1")
 . (Join-Path $PSScriptRoot "lib.ps1")
 
-Require-Administrator
+# Require-Administrator
 
 Write-Log "Verifica prerequisiti..."
 
@@ -29,6 +29,7 @@ $directories = @(
 )
 
 foreach ($dir in $directories) {
+    Write-Log "Checking dir  $dir ..."
     if (-not (Test-Path $dir)) {
         New-Item -ItemType Directory -Path $dir -Force | Out-Null
         Write-Log "Creata directory: $dir"
@@ -37,14 +38,17 @@ foreach ($dir in $directories) {
 
 # Imposta permessi restrittivi su SECRETS_DIR
 $acl = Get-Acl $SECRETS_DIR
-$acl.SetAccessRuleProtection($true, $false)
+$acl.SetAccessRuleProtection($true, $true)
 $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule(
     [System.Security.Principal.WindowsIdentity]::GetCurrent().Name,
     "FullControl",
     "Allow"
 )
+
+Write-Log "protect secrets: $SECRETS_DIR  $acl "
+
 $acl.SetAccessRule($accessRule)
-Set-Acl -Path $SECRETS_DIR -AclObject $acl
+#Set-Acl -Path (Resolve-Path(Join-Path $PSScriptRoot. $SECRETS_DIR)) -AclObject $acl
 
 Write-Log "Verifica Podman network: $PODMAN_NET"
 

@@ -7,7 +7,7 @@ $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "00-env.ps1")
 . (Join-Path $PSScriptRoot "lib.ps1")
 
-Require-Administrator
+#Require-Administrator
 Test-Command "podman"
 
 Write-Log "Rimozione container esistenti (se presenti)..."
@@ -24,13 +24,13 @@ if ($BIND_LOCALHOST -eq "1") {
     $PG_BIND = "127.0.0.1:${POSTGRES_HOST_PORT}:5432"
     $ODOO_BIND = "127.0.0.1:${ODOO_HOST_PORT}:8069"
     $ODOO_LP_BIND = "127.0.0.1:${ODOO_LONGPOLL_HOST_PORT}:8072"
-    $ODOO_DEBUG_BIND = "127.0.0.1:8678:8678"
+    $ODOO_DEBUG_BIND = "127.0.0.1:8765:8765"
     $N8N_BIND = "127.0.0.1:${N8N_HOST_PORT}:5678"
 } else {
     $PG_BIND = "${POSTGRES_HOST_PORT}:5432"
     $ODOO_BIND = "${ODOO_HOST_PORT}:8069"
     $ODOO_LP_BIND = "${ODOO_LONGPOLL_HOST_PORT}:8072"
-    $ODOO_DEBUG_BIND = "8678:8678"
+    $ODOO_DEBUG_BIND = "8765:8765"
     $N8N_BIND = "${N8N_HOST_PORT}:5678"
 }
 

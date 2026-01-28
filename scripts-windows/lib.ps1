@@ -80,28 +80,39 @@ function Write-IfMissing {
         [string]$Path,
         [string]$Content
     )
-
-    if (-not (Test-Path $Path)) {
-        $dir = Split-Path -Parent $Path
+    
+    # FIX 1: Convert to Absolute Path immediately
+    # This ensures .NET and PowerShell are looking at the same place
+    $AbsolutePath = [System.IO.Path]::GetFullPath($Path)
+    
+    if (-not (Test-Path $AbsolutePath)) {
+        $dir = Split-Path -Parent $AbsolutePath
         if ($dir -and -not (Test-Path $dir)) {
             New-Item -ItemType Directory -Path $dir -Force | Out-Null
+            Write-Log "Creata directory: $dir"
         }
 
         # Scrivi file con UTF8 senza BOM
-        [System.IO.File]::WriteAllText($Path, $Content, [System.Text.UTF8Encoding]::new($false))
+        [System.IO.File]::WriteAllText($AbsolutePath, $Content, [System.Text.UTF8Encoding]::new($false))
 
-        # Imposta permessi restrittivi (solo owner)
-        $acl = Get-Acl $Path
-        $acl.SetAccessRuleProtection($true, $false)
+        # FIX 2: Handle Permissions without triggering SeSecurityPrivilege
+        $acl = Get-Acl $AbsolutePath
+        
+        # Change second parameter to $true to copy inherited rules as explicit
+        # This avoids the SeSecurityPrivilege requirement
+        $acl.SetAccessRuleProtection($true, $true)
+        
+        $currentName = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
         $accessRule = New-Object System.Security.AccessControl.FileSystemAccessRule(
-            [System.Security.Principal.WindowsIdentity]::GetCurrent().Name,
+            $currentName,
             "FullControl",
             "Allow"
         )
+        
         $acl.SetAccessRule($accessRule)
-        Set-Acl -Path $Path -AclObject $acl
+        Set-Acl -Path $AbsolutePath -AclObject $acl
 
-        Write-Log "File creato: $Path" -Level "SUCCESS"
+        Write-Log "File creato e protetto: $AbsolutePath" -Level "SUCCESS"
     }
 }
 

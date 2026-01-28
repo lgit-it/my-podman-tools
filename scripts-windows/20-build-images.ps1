@@ -7,7 +7,7 @@ $ErrorActionPreference = "Stop"
 . (Join-Path $PSScriptRoot "00-env.ps1")
 . (Join-Path $PSScriptRoot "lib.ps1")
 
-Require-Administrator
+#Require-Administrator
 Test-Command "podman"
 
 Write-Log "Build immagine Odoo custom (local/odoo-custom:$ODOO_BRANCH)..."
