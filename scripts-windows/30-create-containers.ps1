@@ -43,7 +43,7 @@ podman create `
     --network-alias postgres `
     -p $PG_BIND `
     --env-file (Join-Path $SECRETS_DIR "postgres.env") `
-    -v "${PG_DATA_DIR}:/var/lib/postgresql/data${VOL_LBL}" `
+    -v "postgres_data:/var/lib/postgresql/data${VOL_LBL}" `
     -v "${PG_INIT_DIR}:/docker-entrypoint-initdb.d${VOL_LBL}" `
     -v "${PG_CONF_DIR}:/etc/postgresql${VOL_LBL}" `
     $POSTGRES_IMAGE `
@@ -109,7 +109,7 @@ podman create `
     -v "${NGINX_CONFD_DIR}:/etc/nginx/conf.d${VOL_LBL}" `
     -v "${NGINX_SNIPPETS_DIR}:/etc/nginx/snippets${VOL_LBL}" `
     -v "${NGINX_WEBROOT_DIR}:/var/www/certbot${VOL_LBL}" `
-    -v "${NGINX_LE_DIR}:/etc/letsencrypt${VOL_LBL}" `
+    -v "${NGINX_LE_DIR}:/etc/letsencrypt:ro" `
     "local/nginx-proxy:latest"
 
 if ($LASTEXITCODE -ne 0) {

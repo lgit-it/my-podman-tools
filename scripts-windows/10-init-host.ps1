@@ -109,6 +109,11 @@ if (-not (Test-Path $pgInitPath)) {
     Invoke-RenderTemplate -SourcePath (Join-Path $ROOT_DIR "templates\postgres\01-init.sql.tpl") -DestinationPath $pgInitPath
 }
 
+Write-Log "creazione volume podman data ..."
+
+podman volume create postgres_data --ignore
+
+
 # Odoo config
 $odooConfPath = Join-Path $ODOO_CONF_DIR "odoo.conf"
 if (-not (Test-Path $odooConfPath)) {
