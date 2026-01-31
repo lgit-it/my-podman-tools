@@ -22,7 +22,7 @@ function Write-Log {
         [string]$Level = "INFO"
     )
 
-    $timestamp = Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ" -AsUTC
+    $timestamp = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
     $color = switch ($Level) {
         "ERROR" { "Red" }
         "WARN" { "Yellow" }
