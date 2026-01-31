@@ -66,7 +66,7 @@ $Script:NGINX_WEBROOT_DIR = Join-Path $NGINX_DIR "www"
 $Script:NGINX_LE_DIR = Join-Path $NGINX_DIR "letsencrypt"
 
 # Volume label suffix (vuoto su Windows, non supporta SELinux)
-$Script:VOL_LBL = ""
+$Script:VOL_LBL = ":Z"
 
 # Helper: costruisce bind su localhost o 0.0.0.0 a seconda di BIND_LOCALHOST
 function Get-HostBind {

@@ -7,7 +7,9 @@ longpolling_port = 8072
 
 ; Paths
 data_dir = /var/lib/odoo
-addons_path = /opt/odoo/odoo/addons,/mnt/extra-addons,/mnt/custom-addons
+addons_path = /opt/odoo/odoo/addons,
+    /mnt/extra-addons,
+    /mnt/custom-addons
 
 ; DB
 db_host = postgres
