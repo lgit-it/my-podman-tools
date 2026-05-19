@@ -35,6 +35,7 @@ ODOO_CUST_ADDONS_DIR="${ODOO_DIR}/repo-custom"
 ODOO_BUILD_DIR="${ODOO_DIR}/build"
 
 N8N_DATA_DIR="${BASE_DIR}/n8n/data"
+N8N_FILES_DIR="${BASE_DIR}/n8n/files"
 
 NGINX_DIR="${BASE_DIR}/nginx"
 NGINX_LOG_DIR="${NGINX_DIR}/logs"
