@@ -11,7 +11,7 @@ require_root
 ensure_cmd podman
 
 log "Rimozione container esistenti (se presenti)..."
-podman stop  postgres odoo n8n  nginx 
+#podman stop  postgres odoo n8n  nginx 
 podman rm -f postgres odoo n8n  nginx  >/dev/null 2>&1 || true
 
 # Porte bindate su localhost se BIND_LOCALHOST=1
@@ -67,7 +67,7 @@ podman create \
   --network "${PODMAN_NET}" \
   -p "${N8N_BIND}" \
   --env-file "${SECRETS_DIR}/n8n.env" \
-  -v "${N8N_DATA_DIR}:/home/node/.n8n${VOL_LBL}" \
+  -v "${N8N_DATA_DIR}:/home/node/n8n_data:Z" \
   "${N8N_IMAGE}"
 
 log "Creazione container Nginx reverse-proxy..."
@@ -81,6 +81,7 @@ podman create \
   -v "${NGINX_SNIPPETS_DIR}:/etc/nginx/snippets${VOL_LBL}" \
   -v "${NGINX_WEBROOT_DIR}:/var/www/certbot${VOL_LBL}" \
   -v "${NGINX_LE_DIR}:/etc/letsencrypt${VOL_LBL}" \
+  -v "${NGINX_LOG_DIR}:/var/log/nginx${VOL_LBL}" \
   "local/nginx-proxy:latest"
 
 log "Container creati."

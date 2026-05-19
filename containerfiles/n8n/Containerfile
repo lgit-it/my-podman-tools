@@ -1,2 +1,3 @@
 # Optional: local wrapper image for n8n (not required).
 FROM docker.io/n8nio/n8n:1.39.1
+RUN mkdir -p /home/node/n8n_data && chown node:node /home/node/n8n_data
