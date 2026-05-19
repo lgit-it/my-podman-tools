@@ -36,7 +36,7 @@ podman create \
   --network "${PODMAN_NET}" \
   -p "${N8N_BIND}" \
   --env-file "${SECRETS_DIR}/n8n.env" \
-  --env "N8N_RESTRICT_FILE_ACCESS_TO=/home/node/.n8n:/home/node/files" \
+  --env "N8N_RESTRICT_FILE_ACCESS_TO=/home/node/.n8n;/home/node/files" \
   -v "${N8N_DATA_DIR}:/home/node/.n8n${VOL_LBL}" \
   -v "${N8N_FILES_DIR}:/home/node/files${VOL_LBL}" \
   "${N8N_IMAGE}"
