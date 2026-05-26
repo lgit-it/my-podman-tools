@@ -10,5 +10,5 @@ systemctl --no-pager --full status \
   container-postgres.service \
   container-odoo.service \
   container-n8n.service \
-  container-.service \
+  container-nginx.service \
   | sed -n '1,120p' || true

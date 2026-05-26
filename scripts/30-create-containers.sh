@@ -13,6 +13,7 @@ ensure_cmd podman
 log "Rimozione container esistenti (se presenti)..."
 podman stop -i  postgres odoo n8n  nginx
 podman rm -f -i  postgres odoo n8n  nginx  >/dev/null 2>&1 || true
+#podman stop  postgres odoo n8n  nginx 
 
 # Porte bindate su localhost se BIND_LOCALHOST=1
 if [[ "${BIND_LOCALHOST:-1}" == "1" ]]; then
@@ -67,7 +68,7 @@ podman create \
   --network "${PODMAN_NET}" \
   -p "${N8N_BIND}" \
   --env-file "${SECRETS_DIR}/n8n.env" \
-  -v "${N8N_DATA_DIR}:/home/node/.n8n${VOL_LBL}" \
+  -v "${N8N_DATA_DIR}:/home/node/n8n_data:Z" \
   "${N8N_IMAGE}"
 
 log "Creazione container Nginx reverse-proxy..."
