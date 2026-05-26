@@ -46,6 +46,21 @@ NGINX_LE_DIR="${NGINX_DIR}/letsencrypt"
 # Volume label suffix (":Z" oppure vuoto)
 VOL_LBL="${VOLUME_LABEL:-}"
 
+# ====== Porte host (bind localhost) ======
+# Puoi cambiare (es. 8069->18069) se hai conflitti.
+BIND_LOCALHOST=1
+POSTGRES_HOST_PORT=15432
+ODOO_HOST_PORT=8069
+ODOO_LONGPOLL_HOST_PORT=8072
+ODOO_DEBUG_HOST_PORT=8678
+N8N_HOST_PORT=5678
+NGINX_HTTP_PORT=80
+NGINX_HTTPS_PORT=443
+
+
+
+
+
 # Helper: costruisce bind su localhost o 0.0.0.0 a seconda di BIND_LOCALHOST
 host_bind() {
   local port="$1"

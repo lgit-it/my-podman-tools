@@ -11,8 +11,8 @@ require_root
 ensure_cmd podman
 
 log "Rimozione container esistenti (se presenti)..."
-podman stop  postgres odoo n8n  nginx 
-podman rm -f postgres odoo n8n  nginx  >/dev/null 2>&1 || true
+podman stop -i  postgres odoo n8n  nginx
+podman rm -f -i  postgres odoo n8n  nginx  >/dev/null 2>&1 || true
 
 # Porte bindate su localhost se BIND_LOCALHOST=1
 if [[ "${BIND_LOCALHOST:-1}" == "1" ]]; then
@@ -81,7 +81,8 @@ podman create \
   -v "${NGINX_SNIPPETS_DIR}:/etc/nginx/snippets${VOL_LBL}" \
   -v "${NGINX_WEBROOT_DIR}:/var/www/certbot${VOL_LBL}" \
   -v "${NGINX_LE_DIR}:/etc/letsencrypt${VOL_LBL}" \
+  -v "${NGINX_LOG_DIR}:/var/log/nginx${VOL_LBL}" \
   "local/nginx-proxy:latest"
 
 log "Container creati."
-log "Avvio manuale (se vuoi testare prima di systemd): podman start postgres odoo n8n nginx"
+log "Avvio manuale (se vuoi testare prima di systemd): podman start postgres odoo nginx n8n"
